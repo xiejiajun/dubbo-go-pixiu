@@ -111,12 +111,14 @@ func (f clientFilter) doRemoteCall(c *contexthttp.HttpContext) {
 
 	typ := api.Method.IntegrationRequest.RequestType
 
+	// TODO 根据协议类型获取对应的客户端
 	cli, err := matchClient(typ)
 	if err != nil {
 		c.Err = err
 		return
 	}
 
+	// TODO 通过范化客户端调用目标Dubbo服务的dubbo接口 / 通过http客户端调用目标Http服务的http接口
 	resp, err := cli.Call(client.NewReq(c.Ctx, c.Request, *api))
 	if err != nil {
 		logger.Errorf("[dubbo-go-pixiu] client call err:%v!", err)
@@ -134,8 +136,12 @@ func (f clientFilter) doRemoteCall(c *contexthttp.HttpContext) {
 func matchClient(typ config.RequestType) (client.Client, error) {
 	switch strings.ToLower(string(typ)) {
 	case string(config.DubboRequest):
+		// TODO Dubbo协议用dubbo Client处理，这里获取到的是PX.beforeStart初始化好的Client
 		return dubbo.SingletonDubboClient(), nil
 	case string(config.HTTPRequest):
+		// TODO http协议使用HttpClient处理, http协议的Client在这里初始化，也是单例的，这里的Http协议用于调用Http接口，
+		//  不能调用dubbo 2.7.x及以下版本的dubbo接口(dubbo 3.x兼容Http2, 是否可以通过Http协议调用Dubbo3.x待观望)
+		// TODO 这里也说明了dubbo-go-pixiu不止是一个dubbo接口网关，还可以做Http网关
 		return clienthttp.SingletonHTTPClient(), nil
 	default:
 		return nil, errors.New("not support")

@@ -150,8 +150,10 @@ func (dc *Client) Call(req *client.Request) (res interface{}, err error) {
 
 	logger.Debugf("[dubbo-go-pixiu] dubbo invoke, method:%s, types:%s, reqData:%v", method, types, values)
 
+	// TODO 从池子里面获取dubbogo范化调用客户端
 	gs := dc.Get(dm)
 
+	// TODO 发起dubbo范化调用
 	rst, err := gs.Invoke(req.Context, []interface{}{method, types, values})
 	if err != nil {
 		return nil, err
@@ -162,6 +164,7 @@ func (dc *Client) Call(req *client.Request) (res interface{}, err error) {
 	return rst, nil
 }
 
+// 解析dubbo接口参数类型以及参数
 func (dc *Client) genericArgs(req *client.Request) ([]string, interface{}, error) {
 	values, err := dc.MapParams(req)
 	types := req.API.IntegrationRequest.ParamTypes
@@ -209,6 +212,7 @@ func buildOption(conf fc.MappingParam) client.RequestOption {
 	return opt
 }
 
+// 从缓存获取范化客户端
 func (dc *Client) get(key string) *dg.GenericService {
 	dc.lock.RLock()
 	defer dc.lock.RUnlock()
@@ -234,11 +238,13 @@ func (dc *Client) Get(ir fc.IntegrationRequest) *dg.GenericService {
 	return dc.create(key, ir)
 }
 
+// TODO 生产apiKey，用于缓存范化客户端
 func apiKey(ir *fc.IntegrationRequest) string {
 	dbc := ir.DubboBackendConfig
 	return strings.Join([]string{dbc.ClusterName, dbc.ApplicationName, dbc.Interface, dbc.Version, dbc.Group}, "_")
 }
 
+// 创建范化客户端并缓存
 func (dc *Client) create(key string, irequest fc.IntegrationRequest) *dg.GenericService {
 	referenceConfig := dg.NewReferenceConfig(irequest.Interface, context.TODO())
 	referenceConfig.InterfaceName = irequest.Interface

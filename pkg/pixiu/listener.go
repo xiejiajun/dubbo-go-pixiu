@@ -78,6 +78,7 @@ func (l *ListenerService) httpListener() {
 		}
 	}
 
+	// TODO http请求处理Handler
 	mux := http.NewServeMux()
 	mux.HandleFunc("/", hl.ServeHTTP)
 
@@ -92,6 +93,7 @@ func (l *ListenerService) httpListener() {
 
 	logger.Infof("[dubbo-go-pixiu] httpListener start at : %s", srv.Addr)
 
+	// TODO 启动Http服务，开始监听端口
 	log.Println(srv.ListenAndServe())
 }
 
@@ -129,12 +131,16 @@ func NewDefaultHttpListener() *DefaultHttpListener {
 }
 
 // ServeHTTP http request entrance.
+// Http请求处理入口
 func (s *DefaultHttpListener) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	hc := s.pool.Get().(*h.HttpContext)
 	hc.Request = r
+	// TODO 重置ResponseWriter
 	hc.ResetWritermen(w)
+	// TODO 重置Context
 	hc.Reset()
 
+	// TODO http.Request转router.API对象
 	api, err := s.routeRequest(hc, r)
 	if err != nil {
 		s.pool.Put(hc)
@@ -142,35 +148,46 @@ func (s *DefaultHttpListener) ServeHTTP(w http.ResponseWriter, r *http.Request) 
 	}
 
 	hc.Ctx = context.Background()
+	// TODO 配置一系列处理请求的Filter（责任链模式)
 	addFilter(hc, api)
 
+	// TODO 处理Http请求（触发Filter链)
 	s.handleHTTPRequest(hc)
 
 	s.pool.Put(hc)
 }
 
 func addFilter(ctx *h.HttpContext, api router.API) {
+	// TODO 配置Filter链
 	ctx.AppendFilterFunc(extension.GetMustFilterFunc(constant.LoggerFilter),
 		extension.GetMustFilterFunc(constant.RecoveryFilter), extension.GetMustFilterFunc(constant.TimeoutFilter))
 	alc := config.GetBootstrap().StaticResources.AccessLogConfig
 	if alc.Enable {
+		// TODO 用于打印AccessLog的Filter
 		ctx.AppendFilterFunc(extension.GetMustFilterFunc(constant.AccessLogFilter))
 	}
 	switch api.Method.IntegrationRequest.RequestType {
 	// TODO add some basic filter for diff protocol
 	case fc.DubboRequest:
+		// TODO dubbo协议啥也不做
 
 	case fc.HTTPRequest:
+		// TODO http协议添加用户配置文件自定义的filter
 		httpFilter(ctx, api.Method.IntegrationRequest)
 	}
+
 	// load plugins
+	// TODO 添加URL级别的自定义Filter
 	pluginsFilter := plugins.GetAPIFilterFuncsWithAPIURL(ctx.Request.URL.Path)
 	ctx.AppendFilterFunc(pluginsFilter.Pre...)
 
+	// TODO 最终像目标服务(dubbo服务或者其他http服务)发起请求是在RemoteCallFilter里面进行的
 	ctx.AppendFilterFunc(header.New().Do(), extension.GetMustFilterFunc(constant.RemoteCallFilter))
+	// TODO 下面的Filter都是在获取到响应结果以后执行的
 	ctx.BuildFilters()
 
 	ctx.AppendFilterFunc(pluginsFilter.Post...)
+	// TODO 最后这个Filter用于将结果返回给调用方
 	ctx.AppendFilterFunc(extension.GetMustFilterFunc(constant.ResponseFilter))
 }
 
@@ -185,7 +202,10 @@ func httpFilter(ctx *h.HttpContext, request fc.IntegrationRequest) {
 }
 
 func (s *DefaultHttpListener) routeRequest(ctx *h.HttpContext, req *http.Request) (router.API, error) {
+	// TODO 获取Api发现服务
 	apiDiscSrv := extension.GetMustAPIDiscoveryService(constant.LocalMemoryApiDiscoveryService)
+	// TODO fc.HTTPVerb(req.Method)表示req.Method强转成fc.HTTPVerb类型，因为两者基础类型都是string类型
+	// TODO 根据request的请求路径和request的HttpMethod路由到对应的dubbo api配置信息
 	api, err := apiDiscSrv.GetAPI(req.URL.Path, fc.HTTPVerb(req.Method))
 	if err != nil {
 		ctx.WriteWithStatus(http.StatusNotFound, constant.Default404Body)
@@ -207,7 +227,9 @@ func (s *DefaultHttpListener) routeRequest(ctx *h.HttpContext, req *http.Request
 
 func (s *DefaultHttpListener) handleHTTPRequest(c *h.HttpContext) {
 	if len(c.BaseContext.Filters) > 0 {
+		// TODO 触发Filter链
 		c.Next()
+		// TODO 处理没有任何响应的情况
 		c.WriteHeaderNow()
 		return
 	}

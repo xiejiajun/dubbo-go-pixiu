@@ -37,8 +37,8 @@ It supports HTTP-to-Dubbo and HTTP-to-HTTP proxy and more protocols will be supp
 
 dubbo-go-pixiu supports to invoke 2 protocols:
 
-1. [Http](./docs/sample/http.md) 
-2. [Dubbo](./docs/sample/dubbo.md)
+1. [Http](./docs/sample/http.md): 这里不是说可以使用Http协议调用Dubbo2.x接口，而是说dubbo-go-pixiu除了可以作为dubbo网关，还可以像Nginx一样作为Http网关使用 
+2. [Dubbo](./docs/sample/dubbo.md)：作为dubbo网关时使用这个协议
 
 ## Features
 

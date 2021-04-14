@@ -74,6 +74,7 @@ func (f timeoutFilter) Do() fc.FilterFunc {
 		// the child coroutine may never be able to quit.
 		finishChan := make(chan struct{}, 1)
 		go func() {
+			// TODO 执行下游Filter
 			// panic by recovery
 			c.Next()
 			finishChan <- struct{}{}
@@ -87,6 +88,7 @@ func (f timeoutFilter) Do() fc.FilterFunc {
 			hc.SourceResp = bt
 			hc.TargetResp = &client.Response{Data: bt}
 			hc.WriteJSONWithStatus(http.StatusGatewayTimeout, bt)
+			// TODO 终止Filter链，不再执行下游剩余还没执行的Filter
 			c.Abort()
 		case <-finishChan:
 			// finish call do something.

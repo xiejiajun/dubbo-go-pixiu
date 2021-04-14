@@ -112,6 +112,7 @@ var (
 				runtime.GOMAXPROCS(limitCpus)
 			}
 
+			// TODO 网关启动入口
 			pixiu.Start(bootstrap)
 			return nil
 		},

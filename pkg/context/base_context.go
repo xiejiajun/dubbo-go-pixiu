@@ -55,6 +55,7 @@ func NewBaseContext() *BaseContext {
 // Next should be used only inside middleware.
 // It executes the pending handlers in the chain inside the calling handler.
 // See example in GitHub.
+// TODO 执行下一个Filter
 func (c *BaseContext) Next() {
 	c.Index++
 	for c.Index < int8(len(c.Filters)) {
@@ -65,6 +66,7 @@ func (c *BaseContext) Next() {
 
 // Abort  filter chain break , filter after the current filter will not executed.
 func (c *BaseContext) Abort() {
+	// TODO 将Filter责任链的下标移动到最末端，以此来终止责任链，不再执行下游Filter
 	c.Index = abortIndex
 }
 

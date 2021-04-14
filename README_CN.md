@@ -35,8 +35,8 @@ dubbo-go-pixiu 网关支持调用Java的dubbo集群和golang的dubbo-go集群。
 
 dubbo-go-pixiu支持2种协议的调用:
 
-1. [Http协议调用](./develop/docs/sample/http.md) 
-2. [Dubbo协议调用](./develop/docs/sample/dubbo.md)
+1. [Http协议调用](./develop/docs/sample/http.md) : 像Nginx一样作为Http网关时使用这个协议
+2. [Dubbo协议调用](./develop/docs/sample/dubbo.md)：作为dubbo网关时使用这个协议
 
 ## 特性
 

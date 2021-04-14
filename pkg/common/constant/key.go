@@ -24,11 +24,16 @@ const (
 	HTTPApiFilter            = "dgp.filters.http.api"
 	HTTPDomainFilter         = "dgp.filters.http.domain"
 	RemoteCallFilter         = "dgp.filters.remote_call"
-	TimeoutFilter            = "dgp.filters.timeout"
-	LoggerFilter             = "dgp.filters.logger"
-	RecoveryFilter           = "dgp.filters.recovery"
-	ResponseFilter           = "dgp.filters.response"
-	AccessLogFilter          = "dgp.filters.access_log"
+	// TODO timeout控制Filter
+	TimeoutFilter = "dgp.filters.timeout"
+	// TODO 用于打印请求链路统计日志的Filter
+	LoggerFilter = "dgp.filters.logger"
+	// TODO 用于恢复panic的Filter
+	RecoveryFilter = "dgp.filters.recovery"
+	// TODO 用于将响应结果返回给调用方
+	ResponseFilter = "dgp.filters.response"
+	// TODO 用于打印访问日志的Filter（Nginx的accessLog也是这么打印的吧)
+	AccessLogFilter = "dgp.filters.access_log"
 )
 
 const (

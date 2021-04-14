@@ -59,6 +59,7 @@ func (p *PX) Start() {
 
 	for _, s := range listeners {
 		ls := ListenerService{Listener: &s}
+		// TODO 启动http服务
 		go ls.Start()
 	}
 
@@ -70,15 +71,18 @@ func (p *PX) Start() {
 		if addr.Port == 0 {
 			addr.Port = constant.PprofDefaultPort
 		}
+		// TODO 启动Pprof http服务
 		go http.ListenAndServe(addr.Address+":"+strconv.Itoa(addr.Port), nil)
 		logger.Infof("[dubbopixiu go pprof] httpListener start by : %s", addr.Address+":"+strconv.Itoa(addr.Port))
 	}
 }
 
 func (p *PX) beforeStart() {
+	// TODO 初始化Filter等配置
 	initialize.Run()
 
-	dubbo.SingletonDubboClient().Init()
+	// TODO 初始化dubbgo 范化调用客户端池子
+	_ = dubbo.SingletonDubboClient().Init()
 
 	api.InitAPIsFromConfig(config.GetAPIConf())
 }

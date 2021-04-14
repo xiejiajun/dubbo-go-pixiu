@@ -55,6 +55,7 @@ var (
 )
 
 // Client client to generic invoke dubbo
+// TODO 把pixiu作为Http网关时使用这个客户端
 type Client struct{}
 
 // SingletonHTTPClient singleton HTTP Client
@@ -103,6 +104,7 @@ func (dc *Client) Call(req *client.Request) (resp interface{}, err error) {
 	newReq, _ := http.NewRequest(req.IngressRequest.Method, targetURL, params.Body)
 	newReq.Header = params.Header
 	httpClient := &http.Client{Timeout: 5 * time.Second}
+	// TODO 发起Http请求
 	tmpRet, err := httpClient.Do(newReq)
 
 	return tmpRet, err
