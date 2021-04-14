@@ -78,12 +78,13 @@ func (p *PX) Start() {
 }
 
 func (p *PX) beforeStart() {
-	// TODO 初始化Filter等配置
+	// TODO 初始化Filter、Api发现服务等配置
 	initialize.Run()
 
 	// TODO 初始化dubbgo 范化调用客户端池子
 	_ = dubbo.SingletonDubboClient().Init()
 
+	// TODO 从ApiConfig初始化远程接口->网关提供的API Schema映射关系
 	api.InitAPIsFromConfig(config.GetAPIConf())
 }
 

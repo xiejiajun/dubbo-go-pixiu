@@ -45,5 +45,6 @@ func filterInit() {
 }
 
 func apiDiscoveryServiceInit() {
+	// TODO 初始化Api发现服务
 	sa.Init()
 }

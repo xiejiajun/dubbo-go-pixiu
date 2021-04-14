@@ -91,6 +91,7 @@ var (
 
 			initFromRemote := false
 			if bootstrap.GetAPIMetaConfig() != nil {
+				// TODO 从接口元数据中心动态生成API schema配置
 				if _, err := config.LoadAPIConfig(bootstrap.GetAPIMetaConfig()); err != nil {
 					logger.Errorf("load api config from etcd error:%+v", err)
 				} else {
@@ -99,6 +100,7 @@ var (
 			}
 
 			if !initFromRemote {
+				// TODO 也支持从本地配置文件动态生成API Schema配置
 				if _, err := config.LoadAPIConfigFromFile(apiConfigPath); err != nil {
 					logger.Errorf("load api config error:%+v", err)
 					return err

@@ -73,6 +73,7 @@ func LoadAPIConfig(metaConfig *model.APIMetaConfig) (*fc.APIConfig, error) {
 		etcdv3.WithEndpoints(strings.Split(metaConfig.Address, ",")...),
 	)
 
+	// TODO 监听接口元数据变动
 	go listenAPIConfigNodeEvent(metaConfig.APIConfigPath)
 
 	content, err := client.Get(metaConfig.APIConfigPath)
@@ -80,6 +81,7 @@ func LoadAPIConfig(metaConfig *model.APIMetaConfig) (*fc.APIConfig, error) {
 		return nil, perrors.Errorf("Get remote config fail error %v", err)
 	}
 
+	// TODO 初始化API Schema配置
 	if err = initAPIConfigFromString(content); err != nil {
 		return nil, err
 	}
@@ -152,6 +154,7 @@ func listenAPIConfigNodeEvent(key string) bool {
 				switch event.Type {
 				case mvccpb.PUT:
 					if err = initAPIConfigFromString(string(event.Kv.Value)); err == nil {
+						// TODO 当接口元数据有更新时，更新对应的API信息
 						listener.APIConfigChange(GetAPIConf())
 					}
 				case mvccpb.DELETE:

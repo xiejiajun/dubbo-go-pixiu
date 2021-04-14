@@ -42,6 +42,7 @@ func Init() {
 	extension.SetAPIDiscoveryService(constant.LocalMemoryApiDiscoveryService, NewLocalMemoryAPIDiscoveryService())
 }
 
+// TODO Api发现服务，用于根据Dubbo/Http接口元数据注册API->远程接口映射关系
 // LocalMemoryAPIDiscoveryService is the local cached API discovery service
 type LocalMemoryAPIDiscoveryService struct {
 	router *router.Route
@@ -74,6 +75,7 @@ func (ads *LocalMemoryAPIDiscoveryService) ClearAPI() error {
 	return nil
 }
 
+// TODO 由接口元数据中心的接口元数据变动事件触发
 // APIConfigChange to response to api config change
 func (ads *LocalMemoryAPIDiscoveryService) APIConfigChange(apiConfig config.APIConfig) bool {
 	ads.ClearAPI()
@@ -86,17 +88,20 @@ func (ads *LocalMemoryAPIDiscoveryService) APIConfigChange(apiConfig config.APIC
 }
 
 // InitAPIsFromConfig inits the router from API config and to local cache
+// TODO 服务启动时从apiConfig注册Api Schema到Api发现服务
 func InitAPIsFromConfig(apiConfig config.APIConfig) error {
 	localAPIDiscSrv := extension.GetMustAPIDiscoveryService(constant.LocalMemoryApiDiscoveryService)
 	if len(apiConfig.Resources) == 0 {
 		return nil
 	}
+	// TODO 监听接口配置变化
 	// register config change listener
 	pc.RegisterConfigListener(localAPIDiscSrv)
 	// load pluginsGroup
 	plugins.InitPluginsGroup(apiConfig.PluginsGroup, apiConfig.PluginFilePath)
 	// init plugins from resource
 	plugins.InitAPIURLWithFilterChain(apiConfig.Resources)
+	// TODO 根据接口配置添加API信息
 	return loadAPIFromResource("", apiConfig.Resources, nil, localAPIDiscSrv)
 }
 
@@ -108,6 +113,7 @@ func RefreshAPIsFromConfig(apiConfig config.APIConfig) error {
 	}
 	error := loadAPIFromResource("", apiConfig.Resources, nil, localAPIDiscSrv)
 	if error == nil {
+		// TODO 刷新API Schema
 		extension.SetAPIDiscoveryService(constant.LocalMemoryApiDiscoveryService, localAPIDiscSrv)
 	}
 	return error
