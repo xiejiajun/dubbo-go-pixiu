@@ -20,6 +20,7 @@ resources:
         inboundRequest:
           requestType: http
         integrationRequest:
+          ## requestType表示这是个dubbo接口代理，且它会向UserProvider应用的com.dubbogo.pixiu.UserService接口的CreateUser方法发起调用
           requestType: dubbo
           mappingParams:
             - name: requestBody._all

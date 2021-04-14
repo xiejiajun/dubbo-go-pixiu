@@ -22,6 +22,7 @@ resources:
             - name: name
               required: true
         integrationRequest:
+          ## requestType表示这是个Http代理，它即将代理127.0.0.1:8889/UserProvider/GetUserByName的流量
           requestType: http
           host: 127.0.0.1:8889
           path: /UserProvider/GetUserByName
